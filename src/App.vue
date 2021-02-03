@@ -1,8 +1,5 @@
 <template>
   <div id="app">
-    <div class="search-box">
-      <input type="text" v-model="searchQuery"/>
-    </div>
     <EndlessList :searchQuery="searchQuery" />
   </div>
 </template>

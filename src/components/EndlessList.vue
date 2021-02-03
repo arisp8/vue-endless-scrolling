@@ -1,5 +1,8 @@
 <template>
   <div class="endless-scrolling-list">
+    <div class="search-box">
+      <input type="text" v-model="searchQuery"/>
+    </div>
     <p class="center" v-if="results.length == 0 && !loading">
       Start typing to search something.
     </p>
@@ -25,11 +28,9 @@ export default {
     VirtualList,
     Loader
   },
-  props: {
-    searchQuery: String
-  },
   data() {
     return {
+      searchQuery: '',
       currentPage: 0,
       results: [],
       itemComponent: SearchResult,
