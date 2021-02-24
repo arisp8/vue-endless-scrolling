@@ -1,7 +1,7 @@
 <template>
   <div class="endless-scrolling-list">
     <div class="search-box">
-      <input type="text" v-model="searchQuery"/>
+      <input type="text" v-model="searchQuery" />
     </div>
     <p class="center" v-if="results.length == 0 && !loading">
       Start typing to search something.
@@ -11,82 +11,86 @@
       :data-sources="results"
       :data-component="itemComponent"
       :page-mode="true"
-      />
+    />
     <loader v-if="loading" />
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-import lodash from 'lodash';
-import VirtualList from 'vue-virtual-scroll-list';
-import SearchResult from './SearchResult';
-import Loader from './Loader';
+import axios from "axios";
+import lodash from "lodash";
+import VirtualList from "vue-virtual-scroll-list";
+import SearchResult from "./SearchResult";
+import Loader from "./Loader";
 export default {
-  name: 'EndlessList',
+  name: "EndlessList",
   components: {
     VirtualList,
-    Loader
+    Loader,
   },
   data() {
     return {
-      searchQuery: '',
+      searchQuery: "",
       currentPage: 0,
       results: [],
       itemComponent: SearchResult,
-      loading: false
-    }
+      loading: false,
+    };
   },
   watch: {
     searchQuery: {
       immediate: true,
       handler: lodash.debounce(function(newVal) {
-        if (newVal == '') {
+        if (newVal == "") {
           return;
         }
         this.results = [];
-        this.search(this.currentPage);
-        this.search(this.currentPage + 1);
-        this.currentPage = 2
-      }, 200)
-    }
+        this.currentPage = 0;
+        this.search(newVal, this.currentPage);
+        this.search(newVal, this.currentPage + 1);
+        this.currentPage = 2;
+      }, 200),
+    },
   },
   mounted() {
     const vm = this;
     window.onscroll = lodash.debounce(function() {
-      var distanceFromBottom = document.body.scrollHeight - window.innerHeight - window.scrollY;
-      if (distanceFromBottom < 400) {
-        vm.search(vm.currentPage);
+      var distanceFromBottom =
+        document.body.scrollHeight - window.innerHeight - window.scrollY;
+      if (distanceFromBottom < 400 && vm.searchQuery !== "") {
+        vm.search(vm.searchQuery, vm.currentPage);
         vm.currentPage++;
       }
-    }, 100);
+    }, 100, {leading: true});
   },
   methods: {
-    search(page) {
+    search(query, page) {
       const data = {
-        action: 'query',
-        format: 'json',
-        list: 'search',
-        continue: '-||',
+        action: "query",
+        format: "json",
+        list: "search",
+        continue: "-||",
         utf8: 1,
-        srsearch: this.searchQuery,
+        srsearch: query,
         sroffset: page * 10,
-        origin: '*'
-      }
-      const params = Object.keys(data).map(function(k) {
-                return data[k] == '' ? ''
-                    : encodeURIComponent(k) + '=' + encodeURIComponent(data[k])
-            }).join('&')
-      const searchUrl = `https://en.wikipedia.org/w/api.php?${params}`
+        origin: "*",
+      };
+      const params = Object.keys(data)
+        .map(function(k) {
+          return data[k] == ""
+            ? ""
+            : encodeURIComponent(k) + "=" + encodeURIComponent(data[k]);
+        })
+        .join("&");
+      const searchUrl = `https://en.wikipedia.org/w/api.php?${params}`;
       this.loading = true;
-      axios.get(searchUrl)
-        .then(response => {
-          this.results = this.results.concat(response.data.query.search);
-          this.loading = false;
-        });
-    }
-  }
-}
+      axios.get(searchUrl).then((response) => {
+        this.results = this.results.concat(response.data.query.search);
+        this.loading = false;
+      });
+    },
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -103,7 +107,7 @@ a {
   color: #42b983;
 }
 .searchmatch {
-  background: #F7FFA9;
+  background: #f7ffa9;
 }
 .center {
   text-align: center;

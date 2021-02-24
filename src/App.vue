@@ -35,6 +35,7 @@ export default {
   padding: 4px;
   font-size: 14px;
   box-sizing: border-box;
+  margin-bottom: 20px;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
